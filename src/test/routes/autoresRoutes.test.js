@@ -40,10 +40,37 @@ describe('GET em /autores', () => {
       });
   });
 
+  it('Deve retornar uma lista de livros', (done) => {
+    const autorId = 1;
+    chai.request(app)
+      .get(`/autores/${autorId}/livros`)
+      .set('Accept', 'application/json')
+      .end((err, res) => {
+        expect(res.status).to.equal(200);
+        expect(res.body).to.have.property('autor');
+        expect(res.body).to.have.property('livros');
+        expect(res.body.livros).to.be.an('array');
+        done();
+      });
+  });
+
   it('Não deve retornar um autor com id inválido', (done) => {
     const idAutor = 'A';
     chai.request(app)
       .get(`/autores/${idAutor}`)
+      .set('Accept', 'application/json')
+      .end((err, res) => {
+        expect(res.status).to.equal(404);
+        expect(res.body).to.have.property('message')
+          .eql(`id ${idAutor} não encontrado`);
+        done();
+      });
+  });
+
+  it('Não deve retornar um autor com id inválido na busca por livros a partir do autor', (done) => {
+    const idAutor = 'A';
+    chai.request(app)
+      .get(`/autores/${idAutor}/livros`)
       .set('Accept', 'application/json')
       .end((err, res) => {
         expect(res.status).to.equal(404);
